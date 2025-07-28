@@ -1,35 +1,76 @@
-import React, { useState } from 'react';
+import React, { useState, useRef } from 'react';
+import { saveUserToLocalStorage } from '../utils/saveUserToLocalStorage';
 import { motion } from 'framer-motion';
 import { useAuth } from '../contexts/AuthContext';
 import { useNavigate } from 'react-router-dom';
-import { Mail, Lock, Eye, EyeOff } from 'lucide-react';
 
 const Login: React.FC = () => {
-  const [formData, setFormData] = useState({
-    email: '',
-    password: ''
-  });
-  const [showPassword, setShowPassword] = useState(false);
+  const [step, setStep] = useState<'name' | 'mobile' | 'otp'>('name');
+  const [name, setName] = useState('');
+  const [mobile, setMobile] = useState('');
+  const [otp, setOtp] = useState(['', '', '', '', '', '']);
   const [isLoading, setIsLoading] = useState(false);
-  const { login } = useAuth();
+  const [error, setError] = useState('');
+  const { sendOtp, verifyOtp } = useAuth();
   const navigate = useNavigate();
+  const otpRefs = useRef<Array<HTMLInputElement | null>>([]);
 
-  const handleChange = (e: React.ChangeEvent<HTMLInputElement>) => {
-    setFormData({
-      ...formData,
-      [e.target.name]: e.target.value
-    });
+  const handleNameSubmit = (e: React.FormEvent) => {
+    e.preventDefault();
+    if (!name.trim()) {
+      setError('Please enter your name.');
+      return;
+    }
+    setError('');
+    setStep('mobile');
   };
 
-  const handleSubmit = async (e: React.FormEvent) => {
+  const handleMobileSubmit = async (e: React.FormEvent) => {
     e.preventDefault();
+    if (!/^\d{10}$/.test(mobile)) {
+      setError('Please enter a valid 10-digit mobile number.');
+      return;
+    }
     setIsLoading(true);
-    
+    setError('');
     try {
-      await login(formData.email, formData.password);
+      await sendOtp(name, mobile);
+      setStep('otp');
+    } catch {
+      setError('Failed to send OTP.');
+    } finally {
+      setIsLoading(false);
+    }
+  };
+
+  const handleOtpChange = (idx: number, value: string) => {
+    if (!/^[0-9]?$/.test(value)) return;
+    const newOtp = [...otp];
+    newOtp[idx] = value;
+    setOtp(newOtp);
+    if (value && idx < 5) {
+      otpRefs.current[idx + 1]?.focus();
+    }
+    if (!value && idx > 0) {
+      otpRefs.current[idx - 1]?.focus();
+    }
+  };
+
+  const handleOtpSubmit = async (e: React.FormEvent) => {
+    e.preventDefault();
+    const otpValue = otp.join('');
+    if (otpValue.length !== 6) {
+      setError('Please enter the 6-digit OTP.');
+      return;
+    }
+    setIsLoading(true);
+    setError('');
+    try {
+      await verifyOtp(name, mobile, otpValue);
+      saveUserToLocalStorage(name, mobile);
       navigate('/');
-    } catch (error) {
-      console.error('Login failed:', error);
+    } catch {
+      setError('Invalid OTP or Name.');
     } finally {
       setIsLoading(false);
     }
@@ -56,94 +97,99 @@ const Login: React.FC = () => {
             </p>
           </div>
 
-          <form onSubmit={handleSubmit} className="space-y-6">
-            <div>
-              <label htmlFor="email" className="block text-sm font-medium text-gray-700 mb-2">
-                Email Address
-              </label>
-              <div className="relative">
-                <input
-                  type="email"
-                  id="email"
-                  name="email"
-                  value={formData.email}
-                  onChange={handleChange}
-                  required
-                  className="w-full pl-10 pr-4 py-3 border border-gray-300 rounded-lg focus:outline-none focus:ring-2 focus:ring-blue-500"
-                  placeholder="Enter your email"
-                />
-                <Mail size={20} className="absolute left-3 top-3.5 text-gray-400" />
-              </div>
-            </div>
-
-            <div>
-              <label htmlFor="password" className="block text-sm font-medium text-gray-700 mb-2">
-                Password
-              </label>
-              <div className="relative">
-                <input
-                  type={showPassword ? 'text' : 'password'}
-                  id="password"
-                  name="password"
-                  value={formData.password}
-                  onChange={handleChange}
-                  required
-                  className="w-full pl-10 pr-12 py-3 border border-gray-300 rounded-lg focus:outline-none focus:ring-2 focus:ring-blue-500"
-                  placeholder="Enter your password"
-                />
-                <Lock size={20} className="absolute left-3 top-3.5 text-gray-400" />
-                <button
-                  type="button"
-                  onClick={() => setShowPassword(!showPassword)}
-                  className="absolute right-3 top-3.5 text-gray-400 hover:text-gray-600"
-                >
-                  {showPassword ? <EyeOff size={20} /> : <Eye size={20} />}
-                </button>
-              </div>
-            </div>
-
-            <div className="flex items-center justify-between">
-              <div className="flex items-center">
-                <input
-                  id="remember-me"
-                  name="remember-me"
-                  type="checkbox"
-                  className="h-4 w-4 text-blue-600 focus:ring-blue-500 border-gray-300 rounded"
-                />
-                <label htmlFor="remember-me" className="ml-2 block text-sm text-gray-700">
-                  Remember me
+          {step === 'name' && (
+            <form onSubmit={handleNameSubmit} className="space-y-6">
+              <div>
+                <label htmlFor="name" className="block text-sm font-medium text-gray-700 mb-2">
+                  Full Name
                 </label>
+                <input
+                  type="text"
+                  id="name"
+                  name="name"
+                  value={name}
+                  onChange={e => setName(e.target.value)}
+                  required
+                  className="w-full px-4 py-3 border border-gray-300 rounded-lg focus:outline-none focus:ring-2 focus:ring-blue-500"
+                  placeholder="Enter your full name"
+                />
               </div>
-              <a href="#" className="text-sm text-blue-600 hover:text-blue-500">
-                Forgot password?
-              </a>
-            </div>
+              {error && <div className="text-red-600 text-sm text-center">{error}</div>}
+              <motion.button
+                whileHover={{ scale: 1.02 }}
+                whileTap={{ scale: 0.98 }}
+                type="submit"
+                className="w-full bg-blue-600 text-white py-3 px-6 rounded-lg font-semibold hover:bg-blue-700 transition-colors"
+              >
+                Continue
+              </motion.button>
+            </form>
+          )}
 
-            <motion.button
-              whileHover={{ scale: 1.02 }}
-              whileTap={{ scale: 0.98 }}
-              type="submit"
-              disabled={isLoading}
-              className="w-full bg-blue-600 text-white py-3 px-6 rounded-lg font-semibold hover:bg-blue-700 transition-colors disabled:opacity-50"
-            >
-              {isLoading ? 'Signing in...' : 'Sign In'}
-            </motion.button>
-          </form>
+          {step === 'mobile' && (
+            <form onSubmit={handleMobileSubmit} className="space-y-6">
+              <div>
+                <label htmlFor="mobile" className="block text-sm font-medium text-gray-700 mb-2">
+                  Mobile Number
+                </label>
+                <input
+                  type="tel"
+                  id="mobile"
+                  name="mobile"
+                  value={mobile}
+                  onChange={e => setMobile(e.target.value.replace(/[^0-9]/g, ''))}
+                  required
+                  maxLength={10}
+                  className="w-full px-4 py-3 border border-gray-300 rounded-lg focus:outline-none focus:ring-2 focus:ring-blue-500"
+                  placeholder="Enter your 10-digit mobile number"
+                />
+              </div>
+              {error && <div className="text-red-600 text-sm text-center">{error}</div>}
+              <motion.button
+                whileHover={{ scale: 1.02 }}
+                whileTap={{ scale: 0.98 }}
+                type="submit"
+                disabled={isLoading}
+                className="w-full bg-blue-600 text-white py-3 px-6 rounded-lg font-semibold hover:bg-blue-700 transition-colors disabled:opacity-50"
+              >
+                {isLoading ? 'Sending OTP...' : 'Send OTP'}
+              </motion.button>
+            </form>
+          )}
 
-          <div className="mt-8 text-center">
-            <p className="text-gray-600">
-              Don't have an account?{' '}
-              <a href="#" className="text-blue-600 hover:text-blue-500 font-semibold">
-                Sign up
-              </a>
-            </p>
-          </div>
-
-          <div className="mt-6 p-4 bg-blue-50 rounded-lg">
-            <p className="text-sm text-blue-800">
-              <strong>Demo Login:</strong> Use any email and password to login
-            </p>
-          </div>
+          {step === 'otp' && (
+            <form onSubmit={handleOtpSubmit} className="space-y-6">
+              <div>
+                <label className="block text-sm font-medium text-gray-700 mb-2 text-center">
+                  Enter OTP sent to <span className="font-semibold">{mobile}</span>
+                </label>
+                <div className="flex justify-center gap-2">
+                  {otp.map((digit, idx) => (
+            <input
+              key={idx}
+              ref={el => (otpRefs.current[idx] = el)}
+              type="text"
+              inputMode="numeric"
+              maxLength={1}
+              value={digit}
+              onChange={e => handleOtpChange(idx, e.target.value)}
+              className="w-12 h-12 text-2xl text-center border border-gray-300 rounded focus:outline-none focus:ring-2 focus:ring-blue-500"
+            />
+                  ))}
+                </div>
+              </div>
+              {error && <div className="text-red-600 text-sm text-center">{error}</div>}
+              <motion.button
+                whileHover={{ scale: 1.02 }}
+                whileTap={{ scale: 0.98 }}
+                type="submit"
+                disabled={isLoading}
+                className="w-full bg-blue-600 text-white py-3 px-6 rounded-lg font-semibold hover:bg-blue-700 transition-colors disabled:opacity-50"
+              >
+                {isLoading ? 'Verifying...' : 'Verify & Login'}
+              </motion.button>
+            </form>
+          )}
         </motion.div>
       </div>
     </div>

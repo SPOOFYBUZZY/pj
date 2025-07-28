@@ -8,25 +8,25 @@ const LoanServicesSection: React.FC = () => {
       icon: Home,
       title: 'Home Loans',
       description: 'Affordable housing with low interest rates and flexible repayment options',
-      emoji: '🏠'
+      
     },
     {
       icon: Building,
       title: 'Business Loans',
       description: 'Collateral-free business growth funding for entrepreneurs and MSMEs',
-      emoji: '💼'
+      
     },
     {
       icon: User,
       title: 'Personal Loans',
       description: 'Education, travel, wedding & more - quick personal financing solutions',
-      emoji: '👤'
+      
     },
     {
       icon: Building2,
       title: 'Mortgage Loans',
       description: 'High-value loans against existing property with competitive rates',
-      emoji: '🏡'
+      
     }
   ];
 
@@ -60,7 +60,7 @@ const LoanServicesSection: React.FC = () => {
               className="bg-white rounded-lg p-6 shadow-lg hover:shadow-xl transition-all duration-300 border border-gray-100"
             >
               <div className="text-center mb-6">
-                <div className="text-4xl mb-4">{service.emoji}</div>
+                {/* Removed emoji display */}
                 <service.icon size={32} className="text-blue-600 mx-auto mb-4" />
                 <h3 className="text-xl font-bold text-gray-900 mb-3">
                   {service.title}

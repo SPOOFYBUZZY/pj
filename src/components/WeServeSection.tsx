@@ -4,8 +4,8 @@ import { MapPin } from 'lucide-react';
 
 const WeServeSection: React.FC = () => {
   const cities = [
-    'Coimbatore', 'Tirupur', 'Erode', 'Salem', 'Namakkal', 
-    'Karur', 'Nilgiris', 'Madurai', 'Chennai', 'Trichy', 'Hosur'
+    'Chennai', 'Tirupur', 'Erode', 'Salem', 'Namakkal', 
+    'Karur', 'Nilgiris', 'Madurai', 'Coimbatore', 'Trichy', 'Hosur'
   ];
 
   return (

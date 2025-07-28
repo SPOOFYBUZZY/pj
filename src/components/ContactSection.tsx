@@ -12,7 +12,20 @@ const ContactSection: React.FC = () => {
 
   const handleSubmit = (e: React.FormEvent) => {
     e.preventDefault();
-    // Mock form submission
+    // Save message to localStorage for admin panel support section
+    const messages = JSON.parse(localStorage.getItem('contactMessages') || '[]');
+    const now = new Date();
+    const date = now.toLocaleDateString();
+    const time = now.toLocaleTimeString();
+    messages.push({
+      name: formData.name,
+      email: formData.email,
+      phone: formData.phone,
+      message: formData.message,
+      date,
+      time
+    });
+    localStorage.setItem('contactMessages', JSON.stringify(messages));
     alert('Thank you for your message! We will get back to you soon.');
     setFormData({ name: '', email: '', phone: '', message: '' });
   };

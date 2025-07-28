@@ -1,9 +1,11 @@
-import React from 'react';
+import React, { useState } from 'react';
+import LoanApplicationModal from './LoanApplicationModal';
 import { motion } from 'framer-motion';
 import { Link } from 'react-router-dom';
 import { CheckCircle, TrendingUp } from 'lucide-react';
 
 const HeroSection: React.FC = () => {
+  const [showModal, setShowModal] = useState(false);
   return (
     <section className="relative min-h-screen flex items-center justify-center bg-gradient-to-br from-blue-900 via-blue-800 to-blue-900">
       {/* Background Image with Overlay */}
@@ -62,6 +64,7 @@ const HeroSection: React.FC = () => {
                 whileHover={{ scale: 1.05 }}
                 whileTap={{ scale: 0.95 }}
                 className="w-full sm:w-auto bg-transparent border-2 border-white text-white px-8 py-4 rounded-lg font-semibold text-lg hover:bg-white hover:text-blue-900 transition-colors flex items-center justify-center space-x-2"
+                onClick={() => setShowModal(true)}
               >
                 <TrendingUp size={20} />
                 <span>Apply for a Loan</span>
@@ -111,6 +114,8 @@ const HeroSection: React.FC = () => {
           </motion.div>
         </div>
       </div>
+      {/* Loan Application Modal */}
+      <LoanApplicationModal show={showModal} onClose={() => setShowModal(false)} />
     </section>
   );
 };

@@ -1,4 +1,5 @@
 import React, { useState } from 'react';
+import LoanApplicationModal from '../components/LoanApplicationModal';
 import { motion } from 'framer-motion';
 import { BarChart3, CheckCircle, AlertCircle, TrendingUp } from 'lucide-react';
 
@@ -11,6 +12,7 @@ const CreditScoreChecker: React.FC = () => {
   });
   const [isSubmitted, setIsSubmitted] = useState(false);
   const [creditScore, setCreditScore] = useState<number | null>(null);
+  const [showLoanModal, setShowLoanModal] = useState(false);
 
   const handleChange = (e: React.ChangeEvent<HTMLInputElement>) => {
     setFormData({
@@ -25,6 +27,18 @@ const CreditScoreChecker: React.FC = () => {
     const mockScore = Math.floor(Math.random() * (850 - 300) + 300);
     setCreditScore(mockScore);
     setIsSubmitted(true);
+    // Save to localStorage for admin panel
+    const prev = JSON.parse(localStorage.getItem('creditScoreSubmissions') || '[]');
+    localStorage.setItem('creditScoreSubmissions', JSON.stringify([
+      ...prev,
+      {
+        fullName: formData.fullName,
+        mobileNumber: formData.mobileNumber,
+        panNumber: formData.panNumber,
+        email: formData.email,
+        creditScore: mockScore.toString()
+      }
+    ]));
   };
 
   const getScoreColor = (score: number) => {
@@ -227,9 +241,17 @@ const CreditScoreChecker: React.FC = () => {
                   whileHover={{ scale: 1.05 }}
                   whileTap={{ scale: 0.95 }}
                   className="flex-1 bg-blue-600 text-white py-3 px-6 rounded-lg font-semibold hover:bg-blue-700 transition-colors"
+                  onClick={() => {
+                    if (creditScore && creditScore >= 650) {
+                      setShowLoanModal(true);
+                    } else {
+                      alert('Your credit score must be at least 650 to apply for a loan.');
+                    }
+                  }}
                 >
                   Apply for Loan
                 </motion.button>
+      <LoanApplicationModal show={showLoanModal} onClose={() => setShowLoanModal(false)} />
                 <motion.button
                   whileHover={{ scale: 1.05 }}
                   whileTap={{ scale: 0.95 }}

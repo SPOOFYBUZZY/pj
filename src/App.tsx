@@ -12,6 +12,7 @@ import PrivacyPolicy from './pages/PrivacyPolicy';
 import RefundPolicy from './pages/RefundPolicy';
 import Footer from './components/Footer';
 import { AuthProvider } from './contexts/AuthContext';
+import AdminPanel from './pages/AdminPanel';
 
 function App() {
   return (
@@ -30,6 +31,7 @@ function App() {
               <Route path="/terms" element={<TermsConditions />} />
               <Route path="/privacy" element={<PrivacyPolicy />} />
               <Route path="/refund" element={<RefundPolicy />} />
+              <Route path="/admin" element={<AdminPanel />} />
             </Routes>
           </main>
           <Footer />

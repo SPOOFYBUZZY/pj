@@ -1,7 +1,7 @@
 import React from 'react';
 import { motion } from 'framer-motion';
 import { useAuth } from '../contexts/AuthContext';
-import { User, Mail, Phone, CreditCard, FileText, Settings } from 'lucide-react';
+import { User, Phone, CreditCard, FileText, Settings } from 'lucide-react';
 
 const Profile: React.FC = () => {
   const { user } = useAuth();
@@ -31,8 +31,8 @@ const Profile: React.FC = () => {
               <User size={32} className="text-blue-600" />
             </div>
             <div>
-              <h1 className="text-3xl font-bold text-gray-900">{user.name}</h1> 
-              <p className="text-gray-600">{user.email}</p>
+              <h1 className="text-3xl font-bold text-gray-900">{user.name}</h1>
+              <p className="text-gray-600">{user.mobile}</p>
             </div>
           </div>
         </motion.div>
@@ -54,18 +54,12 @@ const Profile: React.FC = () => {
                   <p className="text-gray-900">{user.name}</p>
                 </div>
               </div>
-              <div className="flex items-center space-x-4">
-                <Mail size={20} className="text-blue-600" />
-                <div>
-                  <label className="block text-sm font-medium text-gray-700">Email Address</label>
-                  <p className="text-gray-900">{user.email}</p>
-                </div>
-              </div>
+              {/* Email removed since login is now via mobile */}
               <div className="flex items-center space-x-4">
                 <Phone size={20} className="text-blue-600" />
                 <div>
-                  <label className="block text-sm font-medium text-gray-700">Phone Number</label>
-                  <p className="text-gray-900">+91 9876543210</p>
+                  <label className="block text-sm font-medium text-gray-700">Mobile Number</label>
+                  <p className="text-gray-900">+91 {user.mobile}</p>
                 </div>
               </div>
             </div>

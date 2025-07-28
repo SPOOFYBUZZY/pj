@@ -24,7 +24,21 @@ const Navbar: React.FC = () => {
         <div className="flex justify-between items-center h-20">
           {/* Logo */}
           <div className="flex-shrink-0">
-            <Link to="/" className="flex items-center">
+            <Link
+              to="/"
+              className="flex items-center"
+              onClick={e => {
+                if (e.altKey) {
+                  e.preventDefault();
+                  const password = prompt('Enter admin password:');
+                  if (password === 'admin123') {
+                    window.location.href = '/admin';
+                  } else if (password !== null) {
+                    alert('Incorrect password!');
+                  }
+                }
+              }}
+            >
               <img
                 src="/LOGO.png"
                 alt="PJ Money Power Logo"
