@@ -31,7 +31,7 @@ const Navbar: React.FC = () => {
                 if (e.altKey) {
                   e.preventDefault();
                   const password = prompt('Enter admin password:');
-                  if (password === 'admin123') {
+                  if (password === 'admin@123') {
                     window.location.href = '/admin';
                   } else if (password !== null) {
                     alert('Incorrect password!');
