@@ -78,15 +78,53 @@ type UserType = {
   eligibility?: string;
 };
 
-// UsersTable component to show name and mobile from localStorage
+// UsersTable component to show name and mobile from localStorage, with improved filter UI and highlight
 const UsersTable: React.FC = () => {
   const users: UserType[] = JSON.parse(localStorage.getItem('users') || '[]');
+  const [filter, setFilter] = useState('');
+  const filterLower = filter.toLowerCase();
+  const filtered = users.filter(user =>
+    Object.values(user).some(val =>
+      typeof val === 'string' && val.toLowerCase().includes(filterLower)
+    )
+  );
+
+  // Helper to highlight filter text
+  const highlight = (text: string) => {
+    if (!filter) return text;
+    const idx = text.toLowerCase().indexOf(filterLower);
+    if (idx === -1) return text;
+    return <>
+      {text.substring(0, idx)}
+      <span className="bg-yellow-200 text-yellow-900 font-bold rounded px-1">{text.substring(idx, idx + filter.length)}</span>
+      {text.substring(idx + filter.length)}
+    </>;
+  };
+
   return (
     <div className="bg-white rounded-lg shadow p-6">
       <h2 className="text-2xl font-bold mb-4">Users</h2>
-      <table className="w-full border">
+      <div className="flex items-center gap-2 mb-4">
+        <input
+          type="text"
+          placeholder="Type to filter users..."
+          value={filter}
+          onChange={e => setFilter(e.target.value)}
+          className="p-2 border-2 border-blue-400 focus:border-blue-600 rounded-lg w-full max-w-xs transition-colors outline-none shadow-sm"
+        />
+        {filter && (
+          <button
+            className="ml-2 px-3 py-2 bg-gray-200 hover:bg-gray-300 rounded-lg text-gray-700 font-semibold text-xs"
+            onClick={() => setFilter('')}
+            title="Clear filter"
+          >
+            Clear
+          </button>
+        )}
+      </div>
+      <table className="w-full border rounded-lg overflow-hidden">
         <thead>
-          <tr className="bg-gray-100">
+          <tr className="bg-blue-100 text-blue-900">
             <th className="p-2 border">Name</th>
             <th className="p-2 border">Mobile</th>
             <th className="p-2 border">Date</th>
@@ -94,17 +132,17 @@ const UsersTable: React.FC = () => {
           </tr>
         </thead>
         <tbody>
-          {users.length === 0 ? (
+          {filtered.length === 0 ? (
             <tr>
-              <td className="p-2 border text-center" colSpan={4}>No users found.</td>
+              <td className="p-2 border text-center text-gray-500" colSpan={4}>No users found.</td>
             </tr>
           ) : (
-            users.map((user: UserType) => (
-              <tr key={user.id}>
-                <td className="p-2 border">{user.name}</td>
-                <td className="p-2 border">{user.mobile}</td>
-                <td className="p-2 border">{user.date || '-'}</td>
-                <td className="p-2 border">{user.time || '-'}</td>
+            filtered.map((user: UserType) => (
+              <tr key={user.id} className="hover:bg-blue-50 transition-colors">
+                <td className="p-2 border">{highlight(user.name)}</td>
+                <td className="p-2 border">{highlight(user.mobile)}</td>
+                <td className="p-2 border">{user.date ? highlight(user.date) : '-'}</td>
+                <td className="p-2 border">{user.time ? highlight(user.time) : '-'}</td>
               </tr>
             ))
           )}
