@@ -132,11 +132,11 @@ const Footer: React.FC = () => {
             </div>
             <div className="flex items-center space-x-3">
               <Phone size={20} className="text-blue-400" />
-              <span className="text-gray-300">+91 9876543210</span>
+              <span className="text-gray-300">+91 9944264799</span>
             </div>
             <div className="flex items-center space-x-3">
               <Mail size={20} className="text-blue-400" />
-              <span className="text-gray-300">info@pjmoneypower.com</span>
+              <span className="text-gray-300">pjmoneypower@gmail.com</span>
             </div>
           </div>
         </div>
@@ -144,7 +144,7 @@ const Footer: React.FC = () => {
         {/* Bottom Bar */}
         <div className="border-t border-gray-800 mt-8 pt-8 flex flex-col md:flex-row justify-between items-center">
           <p className="text-gray-400 text-sm">
-            © 2024 PJ Money Power. All rights reserved.
+            © 2025 PJ Money Power. All rights reserved.
           </p>
           <div className="flex space-x-6 mt-4 md:mt-0">
             <Link to="/terms" className="text-gray-400 hover:text-white text-sm transition-colors">

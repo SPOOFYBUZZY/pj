@@ -55,13 +55,21 @@ const Navbar: React.FC = () => {
               ))}
 
               {/* Admin Panel Button (Desktop) */}
-              <Link
-                to="/admin"
+              <button
                 className="px-3 py-2 rounded-md text-sm font-medium bg-gray-900 text-white hover:bg-blue-700 transition-colors"
                 style={{ marginLeft: '8px' }}
+                onClick={() => {
+                  const password = prompt('Enter admin password:');
+                  if (password === 'admin@123') {
+                    window.location.href = '/admin';
+                  } else if (password !== null) {
+                    alert('Incorrect password!');
+                  }
+                }}
+                type="button"
               >
                 Admin Panel
-              </Link>
+              </button>
               
               {user ? (
                 <div className="relative">
@@ -139,13 +147,21 @@ const Navbar: React.FC = () => {
             ))}
 
             {/* Admin Panel Button (Mobile) */}
-            <Link
-              to="/admin"
-              className="block px-3 py-2 rounded-md text-base font-medium bg-gray-900 text-white hover:bg-blue-700"
-              onClick={() => setIsOpen(false)}
+            <button
+              className="block px-3 py-2 rounded-md text-base font-medium bg-gray-900 text-white hover:bg-blue-700 w-full text-left"
+              onClick={() => {
+                const password = prompt('Enter admin password:');
+                if (password === 'admin@123') {
+                  window.location.href = '/admin';
+                } else if (password !== null) {
+                  alert('Incorrect password!');
+                }
+                setIsOpen(false);
+              }}
+              type="button"
             >
               Admin Panel
-            </Link>
+            </button>
             
             {user ? (
               <div className="border-t pt-2">
