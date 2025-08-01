@@ -158,8 +158,8 @@ const ContactSection: React.FC = () => {
                   <div>
                     <h4 className="font-semibold text-gray-900">Address</h4>
                     <p className="text-gray-600">
-                      123 Business Street,<br />
-                      Tirupur, Tamil Nadu 641604
+                      Opp Sap theatre,<br />
+                      Tirupur, Tamil Nadu 641603.
                     </p>
                   </div>
                 </div>
@@ -168,7 +168,7 @@ const ContactSection: React.FC = () => {
                   <Phone size={24} className="text-blue-600 mt-1" />
                   <div>
                     <h4 className="font-semibold text-gray-900">Phone</h4>
-                    <p className="text-gray-600">+91 9876543210</p>
+                    <p className="text-gray-600">+91 9944264799</p>
                   </div>
                 </div>
                 
@@ -176,7 +176,7 @@ const ContactSection: React.FC = () => {
                   <Mail size={24} className="text-blue-600 mt-1" />
                   <div>
                     <h4 className="font-semibold text-gray-900">Email</h4>
-                    <p className="text-gray-600">info@pjmoneypower.com</p>
+                    <p className="text-gray-600">pjmoneypower@gmail.com</p>
                   </div>
                 </div>
               </div>

@@ -8,12 +8,14 @@ interface EligibilityEntry {
 }
 // LoansPendingTable component
 const LoansPendingTable: React.FC = () => {
-  const [requests] = useState<LoanRequest[]>(() => {
-    return JSON.parse(localStorage.getItem('loanRequests') || '[]');
-  });
-  const [status] = useState<{ [key: number]: string }>(() => {
-    return JSON.parse(localStorage.getItem('loanRequestStatus') || '{}');
-  });
+  const [requests, setRequests] = useState<LoanRequest[]>([]);
+  const [status, setStatus] = useState<{ [key: number]: string }>({});
+  useEffect(() => {
+    if (typeof window !== 'undefined') {
+      setRequests(JSON.parse(localStorage.getItem('loanRequests') || '[]'));
+      setStatus(JSON.parse(localStorage.getItem('loanRequestStatus') || '{}'));
+    }
+  }, []);
   const pending = requests.filter((_, idx) => !status[idx]);
   if (!pending.length) return <div>No pending loan requests.</div>;
   return (
@@ -64,7 +66,7 @@ const navItems = [
 
 
 
-import React, { useState } from 'react';
+import React, { useState, useEffect } from 'react';
 import { useNavigate } from 'react-router-dom';
 
 // User type for all user data in admin panel
@@ -79,16 +81,21 @@ type UserType = {
 };
 
 // UsersTable component to show name and mobile from localStorage, with improved filter UI and highlight
+
 const UsersTable: React.FC = () => {
-  const users: UserType[] = JSON.parse(localStorage.getItem('users') || '[]');
+  const [users, setUsers] = useState<UserType[]>([]);
   const [filter, setFilter] = useState('');
   const filterLower = filter.toLowerCase();
+  useEffect(() => {
+    if (typeof window !== 'undefined') {
+      setUsers(JSON.parse(localStorage.getItem('users') || '[]'));
+    }
+  }, []);
   const filtered = users.filter(user =>
     Object.values(user).some(val =>
       typeof val === 'string' && val.toLowerCase().includes(filterLower)
     )
   );
-
   // Helper to highlight filter text
   const highlight = (text: string) => {
     if (!filter) return text;
@@ -100,7 +107,6 @@ const UsersTable: React.FC = () => {
       {text.substring(idx + filter.length)}
     </>;
   };
-
   return (
     <div className="bg-white rounded-lg shadow p-6">
       <h2 className="text-2xl font-bold mb-4">Users</h2>
@@ -153,7 +159,7 @@ const UsersTable: React.FC = () => {
 };
 
 
-// LoanRequest interface (move to top for type safety)
+// Loan Reguest
 interface LoanRequest {
   name: string;
   mobile: string;
@@ -168,12 +174,14 @@ interface LoanRequest {
 
 // LoansProvidedTable component
 const LoansProvidedTable: React.FC = () => {
-  const [requests] = useState<LoanRequest[]>(() => {
-    return JSON.parse(localStorage.getItem('loanRequests') || '[]');
-  });
-  const [status] = useState<{ [key: number]: string }>(() => {
-    return JSON.parse(localStorage.getItem('loanRequestStatus') || '{}');
-  });
+  const [requests, setRequests] = useState<LoanRequest[]>([]);
+  const [status, setStatus] = useState<{ [key: number]: string }>({});
+  useEffect(() => {
+    if (typeof window !== 'undefined') {
+      setRequests(JSON.parse(localStorage.getItem('loanRequests') || '[]'));
+      setStatus(JSON.parse(localStorage.getItem('loanRequestStatus') || '{}'));
+    }
+  }, []);
   const approved = requests.filter((_, idx) => status[idx] === 'approved');
   if (!approved.length) return <div>No loans provided.</div>;
   return (
@@ -221,7 +229,12 @@ interface ContactMessage {
 }
 
 const SupportTable: React.FC = () => {
-  const messages: ContactMessage[] = JSON.parse(localStorage.getItem('contactMessages') || '[]');
+  const [messages, setMessages] = useState<ContactMessage[]>([]);
+  useEffect(() => {
+    if (typeof window !== 'undefined') {
+      setMessages(JSON.parse(localStorage.getItem('contactMessages') || '[]'));
+    }
+  }, []);
   if (!messages.length) return <div>No support messages found.</div>;
   return (
     <table className="w-full border">
@@ -341,37 +354,7 @@ const AdminPanel: React.FC = () => {
           </div>
         )}
         {selectedSection === 'Loan Eligibility' && (
-          <div className="bg-white rounded-lg shadow p-6">
-            <h2 className="text-2xl font-bold mb-4">Loan Eligibility Details</h2>
-            <table className="w-full border">
-              <thead>
-                <tr className="bg-gray-100">
-                  <th className="p-2 border">Name</th>
-                  <th className="p-2 border">Monthly Income (₹)</th>
-                  <th className="p-2 border">Monthly Expenses (₹)</th>
-                  <th className="p-2 border">Work Type</th>
-                  <th className="p-2 border">Eligibility</th>
-                </tr>
-              </thead>
-              <tbody>
-                {(() => {
-                  const eligibilityData = JSON.parse(localStorage.getItem('loanEligibilitySubmissions') || '[]');
-                  if (!eligibilityData.length) return (
-                    <tr><td className="p-2 border text-center" colSpan={5}>No eligibility submissions found.</td></tr>
-                  );
-                  return (eligibilityData as EligibilityEntry[]).map((entry, idx) => (
-                    <tr key={idx}>
-                      <td className="p-2 border">{entry.name}</td>
-                      <td className="p-2 border">{entry.income}</td>
-                      <td className="p-2 border">{entry.expenses}</td>
-                      <td className="p-2 border">{entry.workType}</td>
-                      <td className={"p-2 border font-bold " + (entry.eligible === 'Eligible' ? 'text-green-600' : 'text-red-600')}>{entry.eligible}</td>
-                    </tr>
-                  ));
-                })()}
-              </tbody>
-            </table>
-          </div>
+          <LoanEligibilityTable />
         )}
         {selectedSection === 'Loan Requests' && (
           <div className="bg-white rounded-lg shadow p-6">
@@ -389,12 +372,14 @@ const AdminPanel: React.FC = () => {
 
 
 const LoanRequestsTable: React.FC = () => {
-  const [requests] = useState<LoanRequest[]>(() => {
-    return JSON.parse(localStorage.getItem('loanRequests') || '[]');
-  });
-  const [status, setStatus] = useState<{ [key: number]: string }>(() => {
-    return JSON.parse(localStorage.getItem('loanRequestStatus') || '{}');
-  });
+  const [requests, setRequests] = useState<LoanRequest[]>([]);
+  const [status, setStatus] = useState<{ [key: number]: string }>({});
+  useEffect(() => {
+    if (typeof window !== 'undefined') {
+      setRequests(JSON.parse(localStorage.getItem('loanRequests') || '[]'));
+      setStatus(JSON.parse(localStorage.getItem('loanRequestStatus') || '{}'));
+    }
+  }, []);
 
   const handleAction = (idx: number, action: 'approved' | 'rejected') => {
     const newStatus = { ...status, [idx]: action };
@@ -463,12 +448,13 @@ interface CreditScoreSubmission {
 }
 
 const CreditScoreSubmissionsTable: React.FC = () => {
-  const [submissions] = useState<CreditScoreSubmission[]>(
-    JSON.parse(localStorage.getItem('creditScoreSubmissions') || '[]')
-  );
-
+  const [submissions, setSubmissions] = useState<CreditScoreSubmission[]>([]);
+  useEffect(() => {
+    if (typeof window !== 'undefined') {
+      setSubmissions(JSON.parse(localStorage.getItem('creditScoreSubmissions') || '[]'));
+    }
+  }, []);
   if (!submissions.length) return <div>No credit score submissions found.</div>;
-
   return (
     <table className="w-full border">
       <thead>
@@ -492,6 +478,47 @@ const CreditScoreSubmissionsTable: React.FC = () => {
         ))}
       </tbody>
     </table>
+  );
+};
+
+// LoanEligibilityTable component
+const LoanEligibilityTable: React.FC = () => {
+  const [eligibilityData, setEligibilityData] = useState<EligibilityEntry[]>([]);
+  useEffect(() => {
+    if (typeof window !== 'undefined') {
+      setEligibilityData(JSON.parse(localStorage.getItem('loanEligibilitySubmissions') || '[]'));
+    }
+  }, []);
+  return (
+    <div className="bg-white rounded-lg shadow p-6">
+      <h2 className="text-2xl font-bold mb-4">Loan Eligibility Details</h2>
+      <table className="w-full border">
+        <thead>
+          <tr className="bg-gray-100">
+            <th className="p-2 border">Name</th>
+            <th className="p-2 border">Monthly Income (₹)</th>
+            <th className="p-2 border">Monthly Expenses (₹)</th>
+            <th className="p-2 border">Work Type</th>
+            <th className="p-2 border">Eligibility</th>
+          </tr>
+        </thead>
+        <tbody>
+          {eligibilityData.length === 0 ? (
+            <tr><td className="p-2 border text-center" colSpan={5}>No eligibility submissions found.</td></tr>
+          ) : (
+            eligibilityData.map((entry, idx) => (
+              <tr key={idx}>
+                <td className="p-2 border">{entry.name}</td>
+                <td className="p-2 border">{entry.income}</td>
+                <td className="p-2 border">{entry.expenses}</td>
+                <td className="p-2 border">{entry.workType}</td>
+                <td className={"p-2 border font-bold " + (entry.eligible === 'Eligible' ? 'text-green-600' : 'text-red-600')}>{entry.eligible}</td>
+              </tr>
+            ))
+          )}
+        </tbody>
+      </table>
+    </div>
   );
 };
 
