@@ -27,17 +27,6 @@ const Navbar: React.FC = () => {
             <Link
               to="/"
               className="flex items-center"
-              onClick={e => {
-                if (e.altKey) {
-                  e.preventDefault();
-                  const password = prompt('Enter admin password:');
-                  if (password === 'admin@123') {
-                    window.location.href = '/admin';
-                  } else if (password !== null) {
-                    alert('Incorrect password!');
-                  }
-                }
-              }}
             >
               <img
                 src="/LOGO.png"
@@ -64,6 +53,15 @@ const Navbar: React.FC = () => {
                   {item.name}
                 </Link>
               ))}
+
+              {/* Admin Panel Button (Desktop) */}
+              <Link
+                to="/admin"
+                className="px-3 py-2 rounded-md text-sm font-medium bg-gray-900 text-white hover:bg-blue-700 transition-colors"
+                style={{ marginLeft: '8px' }}
+              >
+                Admin Panel
+              </Link>
               
               {user ? (
                 <div className="relative">
@@ -139,6 +137,15 @@ const Navbar: React.FC = () => {
                 {item.name}
               </Link>
             ))}
+
+            {/* Admin Panel Button (Mobile) */}
+            <Link
+              to="/admin"
+              className="block px-3 py-2 rounded-md text-base font-medium bg-gray-900 text-white hover:bg-blue-700"
+              onClick={() => setIsOpen(false)}
+            >
+              Admin Panel
+            </Link>
             
             {user ? (
               <div className="border-t pt-2">
