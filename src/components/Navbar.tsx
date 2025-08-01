@@ -9,6 +9,12 @@ const Navbar: React.FC = () => {
   const { user, logout } = useAuth();
   const location = useLocation();
 
+  // Logout on mount (file open/refresh)
+  React.useEffect(() => {
+    logout();
+    // eslint-disable-next-line
+  }, []);
+
   const navigation = [
     { name: 'Home', href: '/' },
     { name: 'About Us', href: '/about' },
@@ -54,23 +60,6 @@ const Navbar: React.FC = () => {
                 </Link>
               ))}
 
-              {/* Admin Panel Button (Desktop) */}
-              <button
-                className="px-3 py-2 rounded-md text-sm font-medium bg-gray-900 text-white hover:bg-blue-700 transition-colors"
-                style={{ marginLeft: '8px' }}
-                onClick={() => {
-                  const password = prompt('Enter admin password:');
-                  if (password === 'admin@123') {
-                    window.location.href = '/admin';
-                  } else if (password !== null) {
-                    alert('Incorrect password!');
-                  }
-                }}
-                type="button"
-              >
-                Admin Panel
-              </button>
-              
               {user ? (
                 <div className="relative">
                   <button
@@ -146,23 +135,6 @@ const Navbar: React.FC = () => {
               </Link>
             ))}
 
-            {/* Admin Panel Button (Mobile) */}
-            <button
-              className="block px-3 py-2 rounded-md text-base font-medium bg-gray-900 text-white hover:bg-blue-700 w-full text-left"
-              onClick={() => {
-                const password = prompt('Enter admin password:');
-                if (password === 'admin@123') {
-                  window.location.href = '/admin';
-                } else if (password !== null) {
-                  alert('Incorrect password!');
-                }
-                setIsOpen(false);
-              }}
-              type="button"
-            >
-              Admin Panel
-            </button>
-            
             {user ? (
               <div className="border-t pt-2">
                 <Link

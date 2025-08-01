@@ -22,6 +22,16 @@ const Login: React.FC = () => {
       return;
     }
     setError('');
+    if (name.trim().toLowerCase() === 'admin') {
+      const password = prompt('Enter admin password:');
+      if (password === 'admin@123') {
+        navigate('/admin');
+        return;
+      } else {
+        setError('Incorrect admin password!');
+        return;
+      }
+    }
     setStep('mobile');
   };
 
